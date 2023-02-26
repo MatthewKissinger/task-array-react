@@ -5,7 +5,6 @@ import './App.css'
 import Overview from './components/Overview'
 
 // TODO 
-// upload to github
 // style with bootcamp for learning purposes
 
 function App() {
@@ -15,8 +14,7 @@ function App() {
       task: {
         text: '', 
         id: uniqid(),
-        buttonId: uniqid(),
-        editId: uniqid()
+        editMode: false
       },
       tasks: []
     } 
@@ -29,7 +27,7 @@ function App() {
         task: {
           text: e.target.value,
           id: prevState.task.id,
-          buttonId: prevState.task.buttonId
+          editMode: false
         }
       })
     })
@@ -43,13 +41,13 @@ function App() {
             {
               text: prevState.task.text,
               id: prevState.task.id,
-              buttonId: prevState.task.buttonId
+              editMode: false
             } 
           ],
           task: {
             text: '',
             id: uniqid(),
-            buttonId: uniqid()
+            editMode: false
           }
         }
       )
@@ -64,7 +62,7 @@ function App() {
           task: {
             text: '', 
             id: uniqid(),
-            buttonId: uniqid()
+            editMode: false
           },
           tasks: prevState.tasks.filter(task => task.text !== title) 
       }
@@ -72,8 +70,55 @@ function App() {
     )
   }
 
-  function editTask(e) {
-    console.log(e.target.id);
+  function editTaskMode(e) {
+    const targetId = e.target.id;
+    const targetIndex = tasksArray.tasks.findIndex(task => task.id === targetId);
+
+    function updateEditModeTrue(targetIndex) {
+      const newArray = tasksArray.tasks.map((task, i) => {
+        if (targetIndex === i) {
+          return {...task, editMode: true};
+        } else {
+          return task;
+        }
+      })
+      return newArray;
+    }
+
+    const newArray = updateEditModeTrue(targetIndex);
+
+    setTasksArray(
+      {
+        task: {
+          text: '', 
+          id: uniqid(),
+          editMode: false
+        },
+        tasks: newArray
+      }
+    )   
+  }
+
+  function submitEdit(e) {
+    console.log('submit changes to task text')
+    // const targetIndex = tasksArray.tasks.findIndex(task => task.id === e.target.id);
+    
+    // function updateTaskText(index) {
+    //   const newArray = tasksArray.tasks.map((task, i) => {
+    //     if (targetIndex === i) {
+    //       return {...task, 
+    //             text: '',
+    //             editMode: false};
+    //     } else {
+    //       return task;
+    //     }
+    //   })
+    //   return newArray;
+    // }
+  }
+
+  function editFieldTextChange(e) {
+    console.log(e.target.id)
   }
 
   return (
@@ -81,8 +126,8 @@ function App() {
       <input 
         className='newTaskName' 
         type="text" 
-        onChange={handleChange} 
-        value={tasksArray.task.text}>
+        value={tasksArray.task.text}
+        onChange={handleChange}>
       </input>
       <button onClick={addNewTask}
         className='add-task-btn'>
@@ -91,7 +136,9 @@ function App() {
       <Overview 
         tasksArray={tasksArray} 
         onDeleteBtnClick={deleteTask}
-        onEditBtnClick={editTask}/>
+        onEditBtnClick={editTaskMode}
+        onTextChange={editFieldTextChange}
+        onClickReSubmit={submitEdit}/>
     </div>
   )
 }
